@@ -1,0 +1,244 @@
+#include <iostream>
+#include <map>
+using namespace std;
+
+struct node
+{
+	pair<int, int> data;
+	node *next;
+	node()
+	{
+		data.first = 0;
+		data.second = 0;
+		next = NULL;
+	}
+	node(node *obj)
+	{
+		data = { obj->data.first,obj->data.second };
+		next = NULL;
+	}
+	node(pair<int, int> obj)
+	{
+		data = obj;
+		next = NULL;
+	}
+};
+
+
+struct set
+{
+	node *head;
+	node *tail;
+	int length;
+	set()
+	{
+		head = NULL;
+		tail = NULL;
+		length = 0;
+	}
+	void input();
+	void output();
+	void outputDec();
+	void push(node*);
+	friend set Union(set, set);
+	friend set Intersection(set, set);
+	friend set Difference(set, set);
+	friend set Decarteres(set, set);
+};
+
+void set::push(node *obj)
+{
+	if (head == NULL)
+	{
+		head = obj;
+		tail = obj;
+	}
+	else
+	{
+		tail->next = obj;
+		tail = tail->next;
+	}
+}
+
+void set::input()
+{
+	cout << "Nhap vao so luong phan tu cua tap hop: ";
+	cin >> length;
+	for (int i = 0; i < length; i++)
+	{
+		node *p = new node;
+		cin >> p->data.first;
+		p->data.second = p->data.first;
+		push(p);
+	}
+}
+void set::output()
+{
+	node *c = head;
+	while (c != NULL)
+	{
+		cout << c->data.first << " ";
+		c = c->next;
+	}
+}
+void set::outputDec()
+{
+	node *prt = head;
+	while (prt != NULL)
+	{
+		cout <<  "(" << prt->data.first << ", " << prt->data.second << ") ";
+		prt = prt->next;
+	}
+}
+set Union(set objA, set objB)
+{
+	set res;
+	node *p = objA.head;
+	while (p != NULL)
+	{
+		node *check = res.head;
+		bool dupli = false;
+		while (check != NULL)
+		{
+			if (check->data.first == p->data.first)
+			{
+				dupli = true;
+				break;
+			}
+			check = check->next;
+		}
+		if (!dupli)
+		{
+			node *add = new node(p);
+			res.push(add);
+		}
+		p = p->next;
+	}
+	p = objB.head;
+	while (p != NULL)
+	{
+		node *check = res.head;
+		bool dupli = false;
+		while (check != NULL)
+		{
+			if (check->data.first == p->data.first)
+			{
+				dupli = true;
+				break;
+			}
+			check = check->next;
+		}
+		if (!dupli)
+		{
+			node *add = new node(p);
+			res.push(add);
+		}
+		p = p->next;
+	}
+	return res;
+}
+set Intersection(set objA, set objB)
+{
+	set res;
+	node *p = objA.head;
+	while (p != NULL)
+	{
+		node *p2 = objB.head;
+		bool dupli = false;
+		while (p2 != NULL)
+		{
+			if (p2->data.first == p->data.first)
+			{
+				dupli = true;
+				break;
+			}
+			p2 = p2->next;
+		}
+		if (dupli)
+		{
+			node *add = new node(p);
+			res.push(add);
+		}
+		p = p->next;
+	}
+	return res;
+}
+set Difference(set objA, set objB)
+{
+	set res;
+	node *p = objA.head;
+	
+	while (p != NULL)
+	{
+		node *p2 = objB.head;
+		bool dupli = false;
+		while (p2 != NULL)
+		{
+			if (p2->data.first == p->data.first)
+			{
+				dupli = true;
+				break;
+			}
+			p2 = p2->next;
+		}
+		if (!dupli)
+		{
+			node *add = new node(p);
+			res.push(add);
+		}
+		p = p->next;
+	}
+	
+	p = objB.head;
+	while (p != NULL)
+	{
+		node *p2 = objA.head;
+		bool dupli = false;
+		while (p2 != NULL)
+		{
+			if (p2->data.first == p->data.first)
+			{
+				dupli = true;
+				break;
+			}
+			p2 = p2->next;
+		}
+		if (!dupli)
+		{
+			node *add = new node(p);
+			res.push(add);
+		}
+		p = p->next;
+	}
+	return res;
+}
+set Decarteres(set objA, set objB)
+{
+	set res;
+	node *p = objA.head;
+	while (p != NULL)
+	{
+		node *p2 = objB.head;
+		while (p2 != NULL)
+		{
+			node *add = new node({p->data.first, p2->data.first});
+			res.push(add);
+			p2 = p2->next;
+		}
+		p = p->next;
+	}
+	return res;
+}
+
+int main()
+{
+	set a;
+	a.input();
+	set b;
+	b.input();
+	Union(a, b).output();
+	Intersection(a, b).output();
+	Difference(a, b).output();
+	Decarteres(a, b).outputDec();
+	return 0;
+}
